@@ -12,7 +12,7 @@ public class HelloWorldController {
     }
 	
     @RequestMapping("/hello")
-    public String hello(Locale locale, Model model) {
+    public String hello() {
         return "Hello World";
     }
 }
