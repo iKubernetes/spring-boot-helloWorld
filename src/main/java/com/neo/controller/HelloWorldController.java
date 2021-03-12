@@ -15,4 +15,9 @@ public class HelloWorldController {
     public String hello() {
         return "Hello World";
     }
+	
+    @RequestMapping("/version")
+    public String version() {
+        return "version 0.9.0";
+    }
 }

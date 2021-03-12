@@ -1,0 +1,25 @@
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  name: spring-boot-helloworld
+  namespace: test
+  labels:
+    app: spring-boot-helloworld
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: spring-boot-helloworld
+  template:
+    metadata:
+      name: spring-boot-helloworld
+      labels:
+        app: spring-boot-helloworld
+    spec:
+      containers:
+      - name: spring-boot-helloworld
+        image: '10.247.192.192:8082/spring-boot-helloworld:v0.9.0'
+        ports:
+        - name: http
+          containerPort: 80
+          protocol: TCP

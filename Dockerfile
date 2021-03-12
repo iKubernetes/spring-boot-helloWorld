@@ -1,4 +1,4 @@
-FROM adoptopenjdk/openjdk11:alpine
+FROM adoptopenjdk/openjdk11:alpine-jre
 
 LABEL maintainer="MageEdu <mage@magedu.com>"
 
