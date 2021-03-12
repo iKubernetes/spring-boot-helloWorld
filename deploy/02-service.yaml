@@ -3,7 +3,7 @@ kind: Service
 apiVersion: v1
 metadata:
   name: spring-boot-helloworld
-  namespace: dev
+  namespace: test
   labels:
     app: spring-boot-helloworld
 spec:
