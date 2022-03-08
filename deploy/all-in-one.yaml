@@ -1,3 +1,24 @@
+kind: Namespace
+apiVersion: v1
+metadata:
+  name: hello
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: spring-boot-helloworld
+  namespace: hello
+  labels:
+    app: spring-boot-helloworld
+spec:
+  type: NodePort
+  ports:
+    - name: http
+      protocol: TCP
+      port: 80
+      targetPort: http
+  selector:
+    app: spring-boot-helloworld
 ---
 kind: Deployment
 apiVersion: apps/v1

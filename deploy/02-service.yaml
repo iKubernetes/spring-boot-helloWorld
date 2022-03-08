@@ -15,3 +15,4 @@ spec:
       targetPort: http
   selector:
     app: spring-boot-helloworld
+---
