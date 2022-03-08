@@ -3,7 +3,7 @@ kind: Service
 apiVersion: v1
 metadata:
   name: spring-boot-helloworld
-  namespace: test
+  namespace: hello
   labels:
     app: spring-boot-helloworld
 spec:
@@ -13,6 +13,5 @@ spec:
       protocol: TCP
       port: 80
       targetPort: http
-      nodePort: 30666
   selector:
     app: spring-boot-helloworld

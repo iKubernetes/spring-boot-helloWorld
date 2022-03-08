@@ -2,7 +2,7 @@ kind: Deployment
 apiVersion: apps/v1
 metadata:
   name: spring-boot-helloworld
-  namespace: test
+  namespace: hello
   labels:
     app: spring-boot-helloworld
 spec:
@@ -18,7 +18,7 @@ spec:
     spec:
       containers:
       - name: spring-boot-helloworld
-        image: '10.247.192.192:8082/spring-boot-helloworld:v0.9.0'
+        image: '__IMAGE__'
         ports:
         - name: http
           containerPort: 80
