@@ -4,9 +4,9 @@ Spring Boot Example.
 80/tcp
 
 ### path
-/version
-/hello
-/
+/version 
+/hello 
+/ 
 
 ## iKubernetes公众号
 
