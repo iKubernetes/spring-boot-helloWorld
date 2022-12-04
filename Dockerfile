@@ -1,4 +1,5 @@
-FROM adoptopenjdk/openjdk11:alpine-jre
+FROM eclipse-temurin:11-jdk-alpine
+#FROM adoptopenjdk/openjdk11:alpine-jre
 
 LABEL maintainer="MageEdu <mage@magedu.com>"
 
