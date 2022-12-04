@@ -1,13 +1,10 @@
-kind: Namespace
-apiVersion: v1
-metadata:
-  name: hello
+# Author: MageEdu <mage@magedu.com>
+# Site: http://www.magedu.com
 ---
 kind: Service
 apiVersion: v1
 metadata:
   name: spring-boot-helloworld
-  namespace: hello
   labels:
     app: spring-boot-helloworld
 spec:
@@ -24,7 +21,6 @@ kind: Deployment
 apiVersion: apps/v1
 metadata:
   name: spring-boot-helloworld
-  namespace: hello
   labels:
     app: spring-boot-helloworld
 spec:
