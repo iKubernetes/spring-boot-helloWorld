@@ -1,69 +1,92 @@
 pipeline {
-    environment { 
-        appName = "spring-boot-helloworld"
-        appVersion = "v0.9.0"
-        //registry = "http://10.247.192.192:8082"
-        registry = "http(s)://YOUR_REGISTRY_HOST:PORT"
-        //registryCredential = "nexus_admin"
-        registryCredential = "YOUR_REGISTRY_USER_CREDENTIAL"
-        dockerImage = ""
-    }     
     agent {
         kubernetes {
-            label 'maven-and-docker'
+            inheritFrom 'kube-maven'
         }
+    }    
+    triggers {
+        gitlab(triggerOnPush: true,
+               triggerOnMergeRequest: true,
+               branchFilterType: 'All',
+               secretToken: '9iH0tq33ROMS07przzLiclNmfqSaoIeTOolHYf1E')
     }
+    parameters {
+        booleanParam(name: "PUSH", defaultValue: true)
+    }    
+    environment {
+        GitRepo="http://gitlab.magedu.com/root/spring-boot-helloWorld.git"
+        HarborServer='hub.magedu.com'
+        ImageUrl="ikubernetes/spring-boot-helloworld"
+        ImageTag="latest"
+        RegistryCredential='harbor-user-credential'
+        RegistryUrl="https://${HarborServer}"
+    }  
     stages {
         stage('Source') {
             steps {
-                git branch: 'master', url: 'http://gitlab.gitlab.svc.cluster.local/root/spring-boot-helloworld.git'
+                git branch: 'main', url: "${GitRepo}"
             }
-        }
+        }      
         stage('Build') {
             steps {
-                container('maven') {
-                    sh 'mvn clean test package'
+            	container('maven') {
+                    sh 'mvn -B -DskipTests clean package'
+                }
+            }
+        }       
+        stage('Test') {
+            steps {
+            	container('maven') {
+                    sh 'mvn test'
                 }
             }
         }
-        stage('Building app image') { 
+        stage("SonarQube Analysis") {
             steps {
-                container('docker') {
-                    script {
-                        dockerImage = docker.build appName + ":" + appVersion
+                withSonarQubeEnv('SonarQube-Server') {
+                    container('maven') {
+                        sh 'mvn sonar:sonar'
                     }
                 }
             }
         }
-        stage('Push app image') {
+        stage("Quality Gate") {
             steps {
-                container('docker') {
+                timeout(time: 30, unit: 'MINUTES') {
+                    waitForQualityGate abortPipeline: true
+                }
+            }
+        }
+        stage('Build Image') {
+            steps {
+                container('dind') {
                     script {
-                        docker.withRegistry( registry, registryCredential ) {
+                        dockerImage = docker.build("${HarborServer}/${ImageUrl}:${ImageTag}")  
+                    }
+                }
+            }
+        }       
+        stage('Push Image') {
+            when {
+                expression { params.PUSH }
+                beforeAgent true
+            }
+            steps {
+                container('dind') {
+                    script {
+                        docker.withRegistry( RegistryUrl, RegistryCredential ) {
                             dockerImage.push()
                         }
                     }
                 }
             }
-        }
-        stage('Deploy') {
-            steps {
-                container('kubectl') {
-                    withKubeConfig([credentialsId: 'k8s-cluster-admin-kubeconfig-file'
-                                    ]) {
-                        sh 'kubectl apply -f deploy/'
-                    }                      
-                }
-            }
+        }                 
+    }
+    post{
+        always {
+            mail to: 'mage@magedu.com',
+            subject: "Status of pipeline: ${currentBuild.fullDisplayName}",
+            body: "${env.BUILD_URL} has result ${currentBuild.result}"
         }
     }
-    post {
-        failure {
-            updateGitlabCommitStatus name: 'build', state: 'failed'
-        }
-        success {
-            updateGitlabCommitStatus name: 'build', state: 'success'
-        }
-    }
-
 }
